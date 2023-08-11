@@ -1,0 +1,34 @@
+from forex_python.converter import CurrencyRates
+from IPython.display import display
+import ipywidgets as widgets
+
+def convert_currency(from_currency, to_currency, amount):
+    try:
+        c = CurrencyRates()
+        result = c.convert(from_currency, to_currency, amount)
+        return f"Converted Amount: {result:.2f} {to_currency}"
+    except ValueError:
+        return "Please enter a valid amount."
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+# Get the list of available currencies
+c = CurrencyRates()
+available_currencies = c.get_rates('USD')
+currencies_list = list(available_currencies.keys())
+
+# GUI elements
+from_currency_combobox = widgets.Dropdown(options=currencies_list, description="From Currency:")
+to_currency_combobox = widgets.Dropdown(options=currencies_list, description="To Currency:")
+amount_input = widgets.FloatText(value=1, description="Amount:")
+convert_button = widgets.Button(description="Convert")
+result_label = widgets.Label()
+
+def on_convert_button_click(b):
+    result = convert_currency(from_currency_combobox.value, to_currency_combobox.value, amount_input.value)
+    result_label.value = result
+
+convert_button.on_click(on_convert_button_click)
+
+# Display the widgets
+widgets.VBox([from_currency_combobox, to_currency_combobox, amount_input, convert_button, result_label])
